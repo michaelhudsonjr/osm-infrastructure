@@ -1,5 +1,5 @@
-# Base image — CUDA 12.1 with cuDNN, Ubuntu 22.04
-FROM nvidia/cuda:12.1.0-cudnn8-devel-ubuntu22.04
+# Base image — CUDA 12.4 with cuDNN, Ubuntu 22.04 (current supported)
+FROM nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
 
 # Prevent interactive prompts during install
 ENV DEBIAN_FRONTEND=noninteractive
@@ -39,3 +39,10 @@ WORKDIR /workspace
 # Expose vLLM port and Open Web UI port
 EXPOSE 8000
 EXPOSE 3000
+
+# Start vLLM server pointing to model on network volume
+CMD ["python3.11", "-m", "vllm.entrypoints.openai.api_server", \
+     "--model", "/workspace/.cache/huggingface/hub/models--Qwen--Qwen3-30B-A3B-FP8/snapshots/d206ba732169f29bb77fbf80fc2c4b81d4d30782", \
+     "--host", "0.0.0.0", \
+     "--port", "8000", \
+     "--served-model-name", "qwen3-30b"]
