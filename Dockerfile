@@ -7,24 +7,31 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Set HuggingFace cache to network volume path
 ENV HF_HOME=/workspace/.cache/huggingface
 
-# Install Python and system dependencies
+# Install Python 3.11 and system dependencies
 RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    python3-dev \
+    software-properties-common \
+    && add-apt-repository ppa:deadsnakes/ppa \
+    && apt-get update && apt-get install -y \
+    python3.11 \
+    python3.11-dev \
+    python3.11-distutils \
     git \
     curl \
     wget \
     && rm -rf /var/lib/apt/lists/*
 
+# Set Python 3.11 as default
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
+RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
+
 # Upgrade pip
-RUN pip3 install --upgrade pip
+RUN python3.11 -m pip install --upgrade pip
 
 # Install vLLM
-RUN pip3 install vllm
+RUN python3.11 -m pip install vllm
 
-# Install Open Web UI dependencies
-RUN pip3 install open-webui
+# Install Open Web UI
+RUN python3.11 -m pip install open-webui
 
 # Set working directory to network volume mount point
 WORKDIR /workspace
